@@ -7,6 +7,8 @@
         <tr class = "table-dark">
             <th></th>
             <th> Product Name </th>
+            <th> Category </th>
+            <th> Price </th>
             <th></th>
         </tr>
     </thead>
@@ -16,12 +18,10 @@
     {%for product in product_list%}
     <tr>
         <td>{{forloop.counter}}</td>
-        <td>
-            <a href= "{%url 'detail' product.p_id %}">{{ product.p_name }}</a>
-        </td>
-        <td>
-            <a href = "{%url 'delete' product.p_id %}">delete</a>   
-        </td>
+        <td>{{ product.p_name }}</td>
+        <td> {{product.category}}</td>
+        <td>{{product.instore_price}} USD</td>
+
     </tr>
         {% endfor %}
         {% else %}

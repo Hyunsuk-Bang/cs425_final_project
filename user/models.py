@@ -1,4 +1,5 @@
 from django.db import models
+from product.models import Product
 
 # Create your models here.
 class Member(models.Model):
@@ -12,6 +13,9 @@ class Member(models.Model):
     reg_date = models.DateField()
     billing_date = models.DateField(blank=True, null=True)
 
+    def get_name(self):
+        return self.name
+    
     class Meta:
         managed = False
         db_table = 'member'
@@ -47,3 +51,12 @@ class Membercardinfo(models.Model):
         db_table = 'memberCardInfo'
         unique_together = (('m', 'card_num'),)
 
+class Cart(models.Model):
+    m = models.OneToOneField('Member', models.DO_NOTHING, primary_key=True)
+    p = models.ForeignKey('product.Product', models.DO_NOTHING)
+    quantity = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'cart'
+        unique_together = (('m', 'p'),)

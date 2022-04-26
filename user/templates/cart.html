@@ -6,22 +6,20 @@
         <thead>
         <tr class = "table-dark">
             <th></th>
-            <th> Product Name </th>
+            <th> Product ID </th>
+            <th> Quantity </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
 
-    {% if product_list %}
-    {%for product in product_list%}
+    {% if cart_list %}
+    {%for product in cart_list%}
     <tr>
         <td>{{forloop.counter}}</td>
-        <td>
-            <a href= "{%url 'detail' product.p_id %}">{{ product.p_name }}</a>
-        </td>
-        <td>
-            <a href = "{%url 'delete' product.p_id %}">delete</a>   
-        </td>
+        <td>{{ product.p_id }}</td>
+        <td> {{product.quantity}}</td>
+
     </tr>
         {% endfor %}
         {% else %}
@@ -33,6 +31,5 @@
         </tbody>
 
     </table>
-
+    <a href = "/user">go back</a>
 </div>
-

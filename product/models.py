@@ -21,6 +21,9 @@ class Product(models.Model):
     instore_price = models.FloatField()
     manufacturer = models.ForeignKey(Manufacturer, models.DO_NOTHING, blank=True, null=True)
 
+    def get_pname(self):
+        return self.p_name    
+    
     class Meta:
         managed = False
         db_table = 'product'

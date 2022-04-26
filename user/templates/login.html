@@ -1,0 +1,13 @@
+<div class="wrapper" style="text-align: center;">
+    <h1>Log IN</h1>
+    <form method="POST">
+        {% csrf_token %}
+        ID: <br>
+        <input name="username" type="text">
+        <br>
+        Password: <br>
+        <input name="password" type="password">
+        <br>
+        <input type="submit" class="btn btn-primary" value="login">
+    </form>
+</div>
