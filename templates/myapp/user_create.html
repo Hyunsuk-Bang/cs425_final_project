@@ -1,0 +1,18 @@
+
+<form action = "{%url 'user_create' %}" method = "post">
+    {%csrf_token %}
+    member_id:    <textarea name = "m_id" id = "m_id" rows = "2"></textarea><br>
+    password:        <textarea name = "password" id = "password" rows = "2" ></textarea><br>
+    re_password:        <textarea name = "re_password" id = "re_password" rows = "2" ></textarea><br>
+    first name: <textarea name = "first_name" id = "first_name" rows = "2"></textarea><br>
+    last name: <textarea name = "last_name" id = "last_name" rows = "2"></textarea><br>
+    phone: <textarea name = "phone" id = "phone" rows = "2"></textarea><br>
+    email: <textarea name = "email" id = "email" rows = "2"></textarea><br>
+    type <select name = 'type'>
+            <option value = "none"> ---select----</option>
+            <option value = "1"> Normal </option>
+            <option value = "2"> Subscript </option>
+    </select>
+    <input type = "submit" value = "SUBMIT">
+    <a href = "{%url 'index' %}">back to list</a>
+</form>

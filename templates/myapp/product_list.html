@@ -1,0 +1,40 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+
+<div class = "container my-3">
+    <table class = "table">
+        <thead>
+        <tr class = "table-dark">
+            <th></th>
+            <th> Product Name </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+    {% if product_list %}
+    {%for product in product_list%}
+    <tr>
+        <td>{{forloop.counter}}</td>
+        <td>
+            <a href= "{%url 'detail' product.p_id %}">{{ product.p_name }}</a>
+        </td>
+        <td>
+            <a href = "{%url 'delete' product.p_id %}">delete</a>   
+        </td>
+    </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td>NO product</td>
+        </tr>
+        {% endif %}
+
+        </tbody>
+
+    </table>
+    <a href = "{%url 'create' %}">new</a>
+    <a href = "{%url 'user_list'%}">new_user</a>
+
+</div>
+

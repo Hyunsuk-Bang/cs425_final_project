@@ -1,0 +1,44 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+
+<div class = "container my-3">
+    <table class = "table">
+        <thead>
+        <tr class = "table-dark">
+            <th></th>
+            <th> Member </th>
+            <th> Name </th>
+            <th> registered Date </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+    {% if member_list %}
+    {%for member in member_list%}
+    <tr>
+        <td>{{forloop.counter}}</td>
+        <td>
+            {{ member.m_id }}
+        </td>
+        <td>
+            {{member.name}}
+        </td> 
+        <td>
+            {{member.reg_date}}
+        </td>
+
+    </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td>NO member</td>
+        </tr>
+        {% endif %}
+
+        </tbody>
+
+    </table>
+    <a href = "{%url 'user_create'%}">new_user</a>
+</div>
+
