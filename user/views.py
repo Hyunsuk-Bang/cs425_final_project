@@ -10,13 +10,62 @@ from django.utils import timezone
 # # Create your views here.
 # def add_to_cart(request):
 #     if request.method == "POST":
-        
+# def add_to_cart(request, p_id):
+#     cur_user = request.user.username
+#     mem = Member.objects.get(m_id = cur_user)
+#     if request.method == "POST":
+#         c =  Cart.objects.filter(m == mem.m_id, p == p_id)
+#         if c:
+#             c[0].quantity += request.POST['quantity']
+#         else:
+#             new_c = Cart(
+#                 m = mem.m_id,
+#                 p = p_id,
+#                 quantity = request.POST['quantitiy']
+#             )
+#             return cart(requset)
+#     else:
+#         return product_detail(request, p_id)
+            
+
 
 def product_detail(request, p_id):
     product = Product.objects.values('p_id','p_name','category', 'instore_price', 'manufacturer__manufacturer_name').get(p_id = p_id)
     whi = Warehouseinv.objects.values('quantity').get(p_id = p_id)
-    print(whi)
-    return render(request, 'product_detail.html', {'product_detail' : product, "quantity": whi})
+    
+    if request.method == "POST":
+        cur_user = request.user.username
+        mem = Member.objects.get(m_id = cur_user)
+        prd = Product.objects.get(p_id = p_id)
+        quan = request.POST.get('quantity', 0)
+        c = Cart.objects.filter(m = mem, p = prd) 
+        print(mem, prd, quan)
+        try:
+            if c:
+                print("DUP!")
+                new_c = Cart(
+                    m = mem, 
+                    p = prd,
+                    quantity = c[0].quantity + int(quan)
+                )
+                c[0].delete()
+                new_c.save()
+                return redirect('/cart')
+            else:
+                new_c2 = Cart(
+                    m = mem,
+                    p = prd,
+                    quantity = quan
+                )
+                new_c2.save()
+                return redirect('/cart')
+        except Exception as e:
+            print(e)
+            return redirect('/')
+        
+    else:    
+        return render(request, 'product_detail.html', {'product_detail' : product, "quantity": whi})
+
 
 def signup(request):
     if request.method == 'POST':
@@ -46,7 +95,8 @@ def signup(request):
 
 def login(request):
     if request.method == 'POST':
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
+        print("?????")
         if user is not None:
             auth.login(request, user)
             return redirect('home')

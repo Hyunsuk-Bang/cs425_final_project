@@ -70,7 +70,7 @@
     {%for product in product_list%}
     <tr>
         <td>{{forloop.counter}}</td>
-        <td><a href = "{{product.p_id}}/">{{ product.p_name }}</a></td>
+        <td><a href = "/{{product.p_id}}">{{ product.p_name }}</a></td>
         <td> {{product.category}}</td>
         <td>{{product.instore_price}} USD</td>
 

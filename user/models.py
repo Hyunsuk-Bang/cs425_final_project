@@ -30,6 +30,7 @@ class Bank(models.Model):
         db_table = 'bank'
 
 class Memberaddress(models.Model):
+    id = models.AutoField(primary_key=True)
     m = models.ForeignKey(Member, models.DO_NOTHING, blank=True, null=True)
     address1 = models.CharField(max_length=50)
     address2 = models.CharField(max_length=50, blank=True, null=True)
@@ -42,6 +43,7 @@ class Memberaddress(models.Model):
         unique_together = ('m', 'address1')
 
 class Membercardinfo(models.Model):
+    id = models.AutoField(primary_key=True)
     m = models.ForeignKey(Member, models.DO_NOTHING, blank = False, null = True)
     card_num = models.CharField(unique=True, max_length=20)
     card_name = models.CharField(max_length=30)
@@ -55,7 +57,8 @@ class Membercardinfo(models.Model):
         unique_together = ('m', 'card_num')
 
 class Cart(models.Model):
-    m = models.OneToOneField('Member', models.DO_NOTHING, primary_key=True)
+    id = models.AutoField(primary_key=True)
+    m = models.ForeignKey(Member, models.DO_NOTHING)
     p = models.ForeignKey('product.Product', models.DO_NOTHING)
     quantity = models.IntegerField()
 

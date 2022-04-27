@@ -24,15 +24,25 @@
         IN STOCK! <br>
         {{quantity.quantity}} left
         <div class="wrapper" style="text-align: center;">
-            <h1>add this to cart</h1>
-    
-            <form method="POST">
-                {% csrf_token %}
-                quantity: <br>
-                <input name="quantity" type="quantity">
-                <br>
-                <input type="submit" class="btn btn-primary" value="add to cart">
-            </form>
+            {% if user.is_authenticated %}
+                <h1>add this to cart</h1>
+                <form method="POST">
+                    {% csrf_token %}
+                    quantity: <br>
+                    <input name="quantity" type="quantity">
+                    <br>
+                    <input type="submit" class="btn btn-primary" value="add to cart">
+                </form>
+            {% else %}
+                <h1> buy this now </h1>
+                <form method="POST">
+                    {% csrf_token %}
+                    quantity: <br>
+                    <input name="quantity" type="quantity">
+                    <br>
+                    <input type="submit" class="btn btn-primary" value="add to cart">
+                </form>
+            {% endif %}   
         </div>
     {% elif quantity.quantity == 0  %}
         Out of Stock! <br> 
