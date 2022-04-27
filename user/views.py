@@ -7,11 +7,16 @@ from product.models import Product
 from warehouseStore.models import Warehouseinv
 from django.utils import timezone
 
-# Create your views here.
+# # Create your views here.
+# def add_to_cart(request):
+#     if request.method == "POST":
+        
 
 def product_detail(request, p_id):
-    product = Product.objects.values('p_id','p_name', 'instore_price', 'manufacturer__manufacturer_name').get(p_id = p_id)
-    return render(request, 'product_detail.html', {'product_detail' : product})
+    product = Product.objects.values('p_id','p_name','category', 'instore_price', 'manufacturer__manufacturer_name').get(p_id = p_id)
+    whi = Warehouseinv.objects.values('quantity').get(p_id = p_id)
+    print(whi)
+    return render(request, 'product_detail.html', {'product_detail' : product, "quantity": whi})
 
 def signup(request):
     if request.method == 'POST':

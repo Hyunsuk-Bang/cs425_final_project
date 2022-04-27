@@ -9,22 +9,49 @@
             <th> manufacturer </th>
             <th> category </th>
             <th> Price </th>
-            <th> Quantity </th>
         </tr>
     </thead>
     <tbody>
-
+    
     <tr>
         <td>{{ product_detail.p_name}} </td> 
         <td>{{ product_detail.manufacturer__manufacturer_name}}</td>
         <td>{{ product_detail.category}} </td> 
         <td> {{ product_detail.instore_price}}</td>
-        <td> {{quan.quanity}} </td>
     </tr>
-
-
-
-
     </table>
+    {% if quantity.quantity > 30 %}
+        IN STOCK! <br>
+        {{quantity.quantity}} left
+        <div class="wrapper" style="text-align: center;">
+            <h1>add this to cart</h1>
+    
+            <form method="POST">
+                {% csrf_token %}
+                quantity: <br>
+                <input name="quantity" type="quantity">
+                <br>
+                <input type="submit" class="btn btn-primary" value="add to cart">
+            </form>
+        </div>
+    {% elif quantity.quantity == 0  %}
+        Out of Stock! <br> 
+    {% else %}
+        Low in Stock! <br>
+        {{quantity.quantity}} left
+        <div class="wrapper" style="text-align: center;">
+            <h1>add this to cart</h1>
+    
+            <form method="POST">
+                {% csrf_token %}
+                quantity: <br>
+                <input name="quantity" type="quantity">
+                <br>
+                <input type="submit" class="btn btn-primary" value="add to cart">
+            </form>
+        </div>
+    {% endif %}
+
+
     <a href = "/">go back</a>
 </div>
