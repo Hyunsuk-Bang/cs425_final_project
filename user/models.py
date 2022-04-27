@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.constraints import *
 from product.models import Product
 
 # Create your models here.
@@ -34,22 +35,24 @@ class Memberaddress(models.Model):
     address2 = models.CharField(max_length=50, blank=True, null=True)
     state = models.CharField(max_length=2)
     zipcode = models.CharField(max_length=15)
-
+    
     class Meta:
         managed = False
         db_table = 'memberAddress'
+        unique_together = ('m', 'address1')
 
 class Membercardinfo(models.Model):
-    m = models.OneToOneField(Member, models.DO_NOTHING, primary_key=True)
+    m = models.ForeignKey(Member, models.DO_NOTHING, blank = False, null = True)
     card_num = models.CharField(unique=True, max_length=20)
     card_name = models.CharField(max_length=30)
-    card_exp_month = models.IntegerField(blank=True, null=True)
-    card_exp_year = models.IntegerField(blank=True, null=True)
+    card_exp_month = models.IntegerField(blank=False, null=True)
+    card_exp_year = models.IntegerField(blank=False, null=True)
+    
 
     class Meta:
         managed = False
         db_table = 'memberCardInfo'
-        unique_together = (('m', 'card_num'),)
+        unique_together = ('m', 'card_num')
 
 class Cart(models.Model):
     m = models.OneToOneField('Member', models.DO_NOTHING, primary_key=True)

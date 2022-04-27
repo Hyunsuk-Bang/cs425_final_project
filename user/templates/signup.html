@@ -1,5 +1,5 @@
 <div class="wrapper" style="text-align: center;">
-    <h1>sign_in</h1>
+    <h1>sign_up</h1>
     <form method="POST">
         {% csrf_token %}
         ID: <br>
@@ -25,6 +25,9 @@
             <option value = "1"> Normal </option>
             <option value = "2"> Subscript </option>
          </select>
+         <br>
+         
         <input type="submit" class="btn btn-primary" value="Sign Up">
     </form>
+    <a href = "/"> go back </a>
 </div>

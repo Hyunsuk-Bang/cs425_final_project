@@ -6,22 +6,21 @@
         <thead>
         <tr class = "table-dark">
             <th></th>
-            <th> Product Name </th>
+            <th> card number </th>
+            <th> name on card </th>
+            <th> card expiration</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
 
-    {% if product_list %}
-    {%for product in product_list%}
+    {% if card_list %}
+    {%for card in card_list%}
     <tr>
         <td>{{forloop.counter}}</td>
-        <td>
-            <a href= "{%url 'detail' product.p_id %}">{{ product.p_name }}</a>
-        </td>
-        <td>
-            <a href = "{%url 'delete' product.p_id %}">delete</a>   
-        </td>
+        <td>{{ card.card_num }}</td>
+        <td> {{ card.card_name}}</td>
+        <td> {{ card.card_exp_month }} {{"/"}} {{card.card_exp_year}}</td>
     </tr>
         {% endfor %}
         {% else %}
@@ -33,6 +32,7 @@
         </tbody>
 
     </table>
-
+    <a href = "new_card">new card </a>
+    <br>
+    <a href = "/">go back</a>
 </div>
-

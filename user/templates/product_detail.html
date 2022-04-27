@@ -1,0 +1,30 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+
+<div class = "container my-3">
+    <table class = "table">
+        <thead>
+        <tr class = "table-dark">
+            <th> Name </th>
+            <th> manufacturer </th>
+            <th> category </th>
+            <th> Price </th>
+            <th> Quantity </th>
+        </tr>
+    </thead>
+    <tbody>
+
+    <tr>
+        <td>{{ product_detail.p_name}} </td> 
+        <td>{{ product_detail.manufacturer__manufacturer_name}}</td>
+        <td>{{ product_detail.category}} </td> 
+        <td> {{ product_detail.instore_price}}</td>
+        <td> {{quan.quanity}} </td>
+    </tr>
+
+
+
+
+    </table>
+    <a href = "/">go back</a>
+</div>

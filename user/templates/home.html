@@ -1,7 +1,90 @@
-<div>
-    {% if user.is_authenticated %}
-        hello, {{username}}<br><a href="logout">log out</a> <a href = "cart">cart</a> </h3>
-    {% else %}
-        <h3><a href="signup">sign in</a> <a href="login">log in</a> <a href="logout">log out</a></h3>
-    {% endif %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+{% if user.is_authenticated %}
+    <div class="wrapper" style="text-align: center;">
+        <div class = "container my-3">
+            <table class = "table">
+            <thead>
+                <tr class = "table-dark">
+                    <th> Hello, {{username}}</th>
+                    <th> </th>
+                    <th> </th>
+                    <th> </th>
+                    <th></th>
+                    <th></th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <td><a href="logout">log out</a> &nbsp <a href = "edit">edit my info</a></td>
+                <td><a href = "card"> my cards </a></td>
+                <td> <a href = "address"> my address </a></td>
+                <td> <a href = "cart">cart</a></td>
+            </tbody>
+
+            </table>
+        </div>
+    </div>
+
+{% else %}
+    <div class="wrapper" style="text-align: center;">
+        <div class = "container my-3">
+            <table class = "table">
+            <thead>
+                <tr class = "table-dark">
+                    <th>welcome, please sign in</th>
+                    <th> </th>
+                    <th> </th>
+                    <th> </th>
+                    <th></th>
+                    <th></th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <td></td>
+                <td><a href="signup">sign in</a></td>
+                <td><a href="login">log in</a></td>
+                <td><a href = "cart"> cart </a></td>
+            </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endif %}
+
+<div class = "container my-3">
+    <table class = "table">
+        <thead>
+        <tr class = "table-dark">
+            <th></th>
+            <th> Product Name </th>
+            <th> Category </th>
+            <th> Price </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+    {% if product_list %}
+    {%for product in product_list%}
+    <tr>
+        <td>{{forloop.counter}}</td>
+        <td><a href = "{{product.p_id}}/">{{ product.p_name }}</a></td>
+        <td> {{product.category}}</td>
+        <td>{{product.instore_price}} USD</td>
+
+    </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td>NO product</td>
+        </tr>
+        {% endif %}
+
+        </tbody>
+
+    </table>
+
 </div>
+

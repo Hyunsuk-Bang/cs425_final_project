@@ -6,39 +6,34 @@
         <thead>
         <tr class = "table-dark">
             <th></th>
-            <th> Member </th>
-            <th> Name </th>
-            <th> registered Date </th>
+            <th> Product Name </th>
+            <th> Category </th>
+            <th> Price </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
 
-    {% if member_list %}
-    {%for member in member_list%}
+    {% if product_list %}
+    {%for product in product_list%}
     <tr>
         <td>{{forloop.counter}}</td>
-        <td>
-            {{ member.m_id }}
-        </td>
-        <td>
-            {{member.name}}
-        </td> 
-        <td>
-            {{member.reg_date}}
-        </td>
+        <td>{{ product.p_name }}</td>
+        <td> {{product.category}}</td>
+        <td>{{product.instore_price}} USD</td>
 
     </tr>
         {% endfor %}
         {% else %}
         <tr>
-            <td>NO member</td>
+            <td>NO product</td>
         </tr>
         {% endif %}
 
         </tbody>
 
     </table>
-    <a href = "{%url 'user_create'%}">new_user</a>
+
 </div>
 
+{% endblock %}
