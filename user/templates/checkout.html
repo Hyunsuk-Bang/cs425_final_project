@@ -11,9 +11,7 @@
             <th> unit price </th>
             <th> qunatity </th>
             <th> total </th>
-            <th> update quantity </th>
             <th></th>
-
         </tr>
     </thead>
     <tbody>
@@ -26,30 +24,17 @@
         <td> {{product.p__instore_price}} USD</td>
         <td> {{product.quantity}}</td>
         <td>{{product.p__instore_price|mul:product.quantity}}   USD</td>
-        <td>  
-            <button class="btn btn-primary" onclick = "location.href='/cart/{{product.p}}/plus';">+ </button>  
-            <button class="btn btn-primary" onclick = "location.href='/cart/{{product.p}}/minus';">- </button>
-        </td>
-        <td>
-            <button class="btn btn-primary" onclick = "location.href='/cart/{{product.p}}/delete';" >delete </button>
-        </td> 
+
     </tr>
-    
+        
     {% endfor %}
-    <br>
-    
-    {% else %}
-        <tr>
-            <td>NO product</td>
-        </tr>
+
     {% endif %}
 
     </tbody>
 
     </table>
+    total: {{total.tot__sum}} USD
     
-    <a href = "/">go back</a>
-    {% if cart_list %} 
-        <button class="btn btn-primary" onclick = "location.href='/checkout'", style="float: right"> proceed to check out </button>
-    {% endif %}
 </div>
+

@@ -6,43 +6,76 @@ from .models import *
 from product.models import Product 
 from warehouseStore.models import Warehouseinv
 from django.utils import timezone
+from django.db.models import Sum, F
 
-# # Create your views here.
-# def add_to_cart(request):
-#     if request.method == "POST":
-# def add_to_cart(request, p_id):
-#     cur_user = request.user.username
-#     mem = Member.objects.get(m_id = cur_user)
-#     if request.method == "POST":
-#         c =  Cart.objects.filter(m == mem.m_id, p == p_id)
-#         if c:
-#             c[0].quantity += request.POST['quantity']
-#         else:
-#             new_c = Cart(
-#                 m = mem.m_id,
-#                 p = p_id,
-#                 quantity = request.POST['quantitiy']
-#             )
-#             return cart(requset)
-#     else:
-#         return product_detail(request, p_id)
-            
 
+def checkout(request):
+    if request.user.is_authenticated: 
+        cur_user = request.user.username
+        cart = Cart.objects.filter(m = cur_user)
+        total = cart.annotate(tot = F('p__instore_price') * F('quantity')).aggregate(Sum('tot'))
+        
+        print(total)
+        card = Membercardinfo.objects.filter(m = cur_user)
+        address = Memberaddress.objects.filter(m = cur_user)
+        
+        context = {"cart": cart,
+                   "total": total,
+                   "card" : card,
+                   "address" : address}
+        return redirect('/')
+        
+    else:
+        cur_user = request.COOKIES['device']
+        cart = cart_list = Cart.objects.values('p__p_name', 'p__instore_price', 'quantity').filter(m = cur_user)
+        total = cart.annotate(tot = F('p__instore_price') * F('quantity')).aggregate(Sum('tot'))
+        card = Membercardinfo.objects.filter(m = cur_user)
+        address = Memberaddress.objects.filter(m = cur_user)
+        print(total)
+        context = {"cart_list": cart,
+                    "total": total,
+                    "card" : card,
+                    "address" : address}
+        return render(request, "checkout.html", context)
+    
+        
+def cart_delete(request, p_id):
+    c = Cart.objects.get(p = p_id)
+    c.delete()
+    print(c)
+    return redirect('/cart')
+
+def cart_plus(request, p_id):
+    c = Cart.objects.get(p = p_id)
+    c.quantity += 1
+    c.save()
+    return redirect('/cart')
+
+def cart_minus(request, p_id):
+    c = Cart.objects.get(p = p_id)
+    c.quantity -= 1
+    if c.quantity  == 0 :
+        cart_delete(request, p_id)
+    else:
+        c.save()
+    return redirect('/cart')
 
 def product_detail(request, p_id):
     product = Product.objects.values('p_id','p_name','category', 'instore_price', 'manufacturer__manufacturer_name').get(p_id = p_id)
-    whi = Warehouseinv.objects.values('quantity').get(p_id = p_id)
+    whi = Warehouseinv.objects.values('quantity').get(p = p_id)
     
     if request.method == "POST":
-        cur_user = request.user.username
+        cur_user = ""
+        if request.user.is_authenticated:    
+            cur_user = request.user.username
+        else:
+            cur_user = request.COOKIES['device']
         mem = Member.objects.get(m_id = cur_user)
         prd = Product.objects.get(p_id = p_id)
         quan = request.POST.get('quantity', 0)
-        c = Cart.objects.filter(m = mem, p = prd) 
-        print(mem, prd, quan)
+        c = Cart.objects.filter(m = mem, p = prd)
         try:
             if c:
-                print("DUP!")
                 new_c = Cart(
                     m = mem, 
                     p = prd,
@@ -96,7 +129,6 @@ def signup(request):
 def login(request):
     if request.method == 'POST':
         user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
-        print("?????")
         if user is not None:
             auth.login(request, user)
             return redirect('home')
@@ -120,17 +152,36 @@ def home(request):
         except:
             return render(request, 'home.html', {'product_list':product_list})
     else:
+        device = request.COOKIES['device']
+        customer = Member.objects.get_or_create(
+            m_id = device,
+            name = "non_user",
+            phone = "-1",
+            email = device,
+            type = 1,
+            user_status = 1,
+            reg_date = '2999-12-31',
+            billing_date = '2999-12-31')
         return render(request, 'home.html', {'product_list':product_list} )
 
 
 def cart(request):
-    if request.user.is_authenticated: 
-        cart_list = Cart.objects.filter(m = request.user.username)
-            
+    if request.user.is_authenticated:    
+        cart_list = Cart.objects.values('p_name', 'p__instore_price', 'quantity', 'p').filter(m = request.user.username)
         context = {
             'cart_list' : cart_list
         }
-    return render(request, 'cart.html', context)
+        return render(request, 'cart.html', context)
+    else:
+        device = request.COOKIES['device']
+        cart_list = Cart.objects.values('p__p_name', 'p__instore_price', 'quantity', 'p').filter(m = device)
+        context = {
+            'cart_list' : cart_list
+        }
+        return render(request, 'cart.html', context)
+        
+        
+        
 
 
 def card(request):

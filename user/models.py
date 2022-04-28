@@ -4,11 +4,10 @@ from product.models import Product
 
 # Create your models here.
 class Member(models.Model):
-    m_id = models.CharField(primary_key=True, max_length=20)
-    password = models.CharField(max_length=50)
+    m_id = models.CharField(primary_key=True, max_length=50)
     name = models.CharField(max_length=20)
     phone = models.CharField(max_length=20)
-    email = models.CharField(unique=True, max_length=20, blank=True, null=True)
+    email = models.CharField(unique=True, max_length=50, blank=True, null=True)
     type = models.IntegerField(blank=True, null=True)
     user_status = models.IntegerField(blank=True, null=True)
     reg_date = models.DateField()

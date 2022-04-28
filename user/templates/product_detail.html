@@ -1,4 +1,5 @@
 {% load static %}
+{% load mathfilters %}
 <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
 
 <div class = "container my-3">
@@ -23,9 +24,9 @@
     {% if quantity.quantity > 30 %}
         IN STOCK! <br>
         {{quantity.quantity}} left
-        <div class="wrapper" style="text-align: center;">
+        <div class="wrapper" style="text-align: right;">
             {% if user.is_authenticated %}
-                <h1>add this to cart</h1>
+                <h2>add this to cart</h2>
                 <form method="POST">
                     {% csrf_token %}
                     quantity: <br>
@@ -37,9 +38,7 @@
                 <h1> buy this now </h1>
                 <form method="POST">
                     {% csrf_token %}
-                    quantity: <br>
-                    <input name="quantity" type="quantity">
-                    <br>
+                    quantity: <input name="quantity" type="quantity">
                     <input type="submit" class="btn btn-primary" value="add to cart">
                 </form>
             {% endif %}   

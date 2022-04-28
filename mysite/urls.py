@@ -20,6 +20,7 @@ from user.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home),
+    path('checkout/', checkout, name = 'checkout'),
     path('signup/', signup),
     path('login/', login),
     path('logout/', logout),
@@ -31,4 +32,8 @@ urlpatterns = [
     path('product/', include('product.urls')),
     path('user/', include('user.urls')),
     path('<str:p_id>/', product_detail, name = 'detail'),
+    path('cart/<str:p_id>/delete', cart_delete, name = 'cart_delete'),
+    path('cart/<str:p_id>/plus', cart_plus, name = 'cart_plus'),
+    path('cart/<str:p_id>/minus', cart_minus, name = 'cart_minus'),
+
 ]
