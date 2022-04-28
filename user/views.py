@@ -112,7 +112,6 @@ def signup(request):
     
             member = Member(
                 m_id = request.POST['username'],
-                password = request.POST['password1'],
                 name = request.POST['name'],
                 phone = request.POST['phone'],
                 email = request.POST['email'],
