@@ -34,6 +34,8 @@ urlpatterns = [
     path('product/', include('product.urls')),
     path('user/', include('user.urls')),
     path('<str:p_id>/', product_detail, name = 'detail'),
+    path("address/<str:address>/delete", address_delete, name = "address_delete"), 
+    path("card/<str:card_num>/delete", card_delete, name = "cart_delete"),
     path('cart/<str:p_id>/delete', cart_delete, name = 'cart_delete'),
     path('cart/<str:p_id>/plus', cart_plus, name = 'cart_plus'),
     path('cart/<str:p_id>/minus', cart_minus, name = 'cart_minus'),

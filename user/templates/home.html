@@ -50,7 +50,7 @@
             </thead>
             <tbody>
                 <td><a href="logout">log out</a> &nbsp <a href = "edit">edit my info</a></td>
-                <td> <a href = "user/history"> my purchase history </a></td>
+                <td> <a href = "history"> my purchase history </a></td>
                 <td><a href = "card"> my cards </a></td>
                 <td> <a href = "address"> my address </a></td>
                 <td> <a href = "cart">cart</a></td>
@@ -93,7 +93,38 @@
         <tr class = "table-dark">
             <th></th>
             <th> Product Name </th>
-            <th> Category </th>
+            <th>
+            <form method = "POST">
+                {% csrf_token %}
+                Category
+                <select name = 'category'>
+                    <option value = "all">ALL</option>
+                    <option value = "computer"> Computer </option>
+                    <option value = "accessory"> accessory </option>
+                    <option value = "computer"> computer </option>
+                    <option value = "phone"> phone </option>
+                </select> 
+            <form>
+            </th>
+            <th>
+                Manufacturer
+                <form method = "POST">
+                    {% csrf_token %}
+                    <select name = 'man'>
+                        <option value = "all">ALL</option>
+                        <option value = "man_01"> Samsung </option>
+                        <option value = "man_02"> Apple </option>
+                        <option value = "man_03"> Dell </option>
+                        <option value = "man_04"> Lonovo </option>
+                        <option value = "man_05"> Logitech </option>
+                        <option value = "man_06"> Razer </option>
+                        <option value = "man_07"> Google </option>
+                        <option value = "man_08"> Sony </option>
+                        <option value = "man_09"> Canon </option>
+                        <input type="submit" class="btn btn-primary" value="apply">
+                    </select> 
+                <form>
+            </th>
             <th> Price </th>
             <th></th>
         </tr>
@@ -106,6 +137,7 @@
         <td>{{forloop.counter}}</td>
         <td><a href = "/{{product.p_id}}">{{ product.p_name }}</a></td>
         <td> {{product.category}}</td>
+        <td>{{product.manufacturer__manufacturer_name}}</td>
         <td>{{product.instore_price}} USD</td>
 
     </tr>

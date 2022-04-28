@@ -16,6 +16,7 @@ class Orderlist(models.Model):
 class Onlineorder(models.Model):
     id = models.AutoField(primary_key=True)
     order = models.ForeignKey('Orderlist', models.DO_NOTHING)
+    order_date = models.DateField()
     p = models.ForeignKey('product.Product', models.DO_NOTHING, blank=True, null=True)
     quantity = models.IntegerField()
     customer_type = models.IntegerField(blank=True, null=True)

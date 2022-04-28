@@ -9,6 +9,7 @@
             <th> card number </th>
             <th> name on card </th>
             <th> card expiration</th>
+            <th> Balance </th>
             <th></th>
         </tr>
     </thead>
@@ -21,6 +22,8 @@
         <td>{{ card.card_num }}</td>
         <td> {{ card.card_name}}</td>
         <td> {{ card.card_exp_month }} {{"/"}} {{card.card_exp_year}}</td>
+        <td> {{card.balance}} USD </td>
+        <td> <button class="btn btn-primary" onclick = "location.href='/card/{{card.card_num}}/delete';" >delete </button> </td>
     </tr>
         {% endfor %}
         {% else %}

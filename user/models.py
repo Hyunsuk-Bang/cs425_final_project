@@ -20,13 +20,13 @@ class Member(models.Model):
         managed = False
         db_table = 'member'
 
-class Bank(models.Model):
-    card_num = models.ForeignKey('Membercardinfo', models.DO_NOTHING, db_column='card_num', blank=True, null=True)
-    balance = models.FloatField()
+# class Bank(models.Model):
+#     card_num = models.ForeignKey('Membercardinfo', models.DO_NOTHING, db_column='card_num', blank=True, null=True)
+#     balance = models.FloatField()
 
-    class Meta:
-        managed = False
-        db_table = 'bank'
+#     class Meta:
+#         managed = False
+#         db_table = 'bank'
 
 class Memberaddress(models.Model):
     id = models.AutoField(primary_key=True)
@@ -48,7 +48,7 @@ class Membercardinfo(models.Model):
     card_name = models.CharField(max_length=30)
     card_exp_month = models.IntegerField(blank=False, null=True)
     card_exp_year = models.IntegerField(blank=False, null=True)
-    
+    balance = models.FloatField()
 
     class Meta:
         managed = False

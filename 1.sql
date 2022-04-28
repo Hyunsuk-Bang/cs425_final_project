@@ -28,15 +28,11 @@ create table memberCardInfo(
     card_exp_month int constraint card01 check(card_exp_month between 1 and 12),
     card_exp_year int constraint card02 check(card_exp_year between 0 and 99),
     foreign key (m_id) references member(m_id),
+    balance double not null,
     UNIQUE(m_id, card_num)
 );
 
 
-create table bank(
-	card_num varchar(20),
-	balance double not null,
-	foreign key (card_num) REFERENCES memberCardInfo(card_num)
-);
 
 
 CREATE TABLE manufacturer(
@@ -148,8 +144,11 @@ create table ShippingCompany(
 );
 
 create table onlineOrder(
+	id BIGINT not null auto_increment primary key,
 	order_id BIGINT not null,
 	foreign key (order_id) references orderList(order_id),
+	
+	order_date date not null,	
 	
 	p_id varchar(10),
 	FOREIGN KEY (p_id) REFERENCES product(p_id),
@@ -207,9 +206,6 @@ create table cart(
 	quantity int not null,
 	UNIQUE(m_id, p_id)
 );
-
-DROP TRIGGER IF EXISTS `warehouseInit4`;
-DROP TRIGGER IF EXISTS `warehouseInit3`;
 
 delimiter //
 Create Trigger warehouseInit

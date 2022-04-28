@@ -22,6 +22,7 @@
             {{ address.address2}}</td>
         <td> {{ address.state}}</td>
         <td> {{ address.zipcode}}</td>
+        <td> <button class="btn btn-primary" onclick = "location.href='/address/{{address.address1}}/delete';" >delete </button> </td>
     </tr>
     {% endfor %}
     {% else %}

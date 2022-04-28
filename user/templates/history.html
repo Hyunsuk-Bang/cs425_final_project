@@ -8,10 +8,11 @@
         <tr class = "table-dark">
             <th></th>
             <th> date </th>
-            <th> unit price </th>
+            <th> product </th>
             <th> qunatity </th>
-            <th> total </th>
-            <th></th>
+            <th> card </th>
+            <th>address</th>
+            <th> phone </th>
         </tr>
     </thead>
     <tbody>
@@ -20,7 +21,7 @@
     {%for hist in history %}
     <tr>
         <td>{{forloop.counter}}</td>
-        <td>{{ hist.order_id }}</td>
+        <td>{{ hist.order_date}}</td>
         <td> {{hist.p__p_name}} </td>
         <td> {{hist.quantity}}</td>
         <td>{{hist.card_info}}</td>
