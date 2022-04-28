@@ -12,18 +12,16 @@ from django.db.models import Sum, F
 def checkout(request):
     if request.user.is_authenticated: 
         cur_user = request.user.username
-        cart = Cart.objects.filter(m = cur_user)
+        cart = cart_list = Cart.objects.values('p__p_name', 'p__instore_price', 'quantity').filter(m = cur_user)
         total = cart.annotate(tot = F('p__instore_price') * F('quantity')).aggregate(Sum('tot'))
-        
-        print(total)
         card = Membercardinfo.objects.filter(m = cur_user)
         address = Memberaddress.objects.filter(m = cur_user)
-        
-        context = {"cart": cart,
-                   "total": total,
-                   "card" : card,
-                   "address" : address}
-        return redirect('/')
+        print(total)
+        context = {"cart_list": cart,
+                    "total": total,
+                    "card" : card,
+                    "address" : address}
+        return render(request, "checkout.html", context)
         
     else:
         cur_user = request.COOKIES['device']
@@ -166,7 +164,7 @@ def home(request):
 
 def cart(request):
     if request.user.is_authenticated:    
-        cart_list = Cart.objects.values('p_name', 'p__instore_price', 'quantity', 'p').filter(m = request.user.username)
+        cart_list = Cart.objects.values('p__p_name', 'p__instore_price', 'quantity', 'p').filter(m = request.user.username)
         context = {
             'cart_list' : cart_list
         }
