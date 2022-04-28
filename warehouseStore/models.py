@@ -24,12 +24,12 @@ class Store(models.Model):
 
 
 class Warehouseinv(models.Model):
-    w = models.OneToOneField(Warehouse, models.DO_NOTHING, primary_key=True)
+    id = models.AutoField(primary_key=True)
+    w = models.ForeignKey(Warehouse, models.DO_NOTHING)
     p = models.ForeignKey(Product, models.DO_NOTHING)
     quantity = models.IntegerField(blank=True, null=True)
     threshold = models.IntegerField(blank=True, null=True)
-    type = models.IntegerField(blank=True, null=True)
-
+    
     class Meta:
         managed = False
         db_table = 'warehouseINV'

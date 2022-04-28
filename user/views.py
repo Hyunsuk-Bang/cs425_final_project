@@ -7,34 +7,117 @@ from product.models import Product
 from warehouseStore.models import Warehouseinv
 from django.utils import timezone
 from django.db.models import Sum, F
+from order.models import *
 
+def history(request):
+    mem = Member.objects.get(m_id=request.user.username)
+    hist = Onlineorder.objects.values('p__p_name', 'quantity', 'card_info').filter(m = mem)
+    return render(request, "history.html", {'history':hist})
 
 def checkout(request):
-    if request.user.is_authenticated: 
+    if request.user.is_authenticated:
         cur_user = request.user.username
-        cart = cart_list = Cart.objects.values('p__p_name', 'p__instore_price', 'quantity').filter(m = cur_user)
-        total = cart.annotate(tot = F('p__instore_price') * F('quantity')).aggregate(Sum('tot'))
-        card = Membercardinfo.objects.filter(m = cur_user)
-        address = Memberaddress.objects.filter(m = cur_user)
-        print(total)
-        context = {"cart_list": cart,
-                    "total": total,
-                    "card" : card,
-                    "address" : address}
-        return render(request, "checkout.html", context)
-        
+        if request.method == "POST":
+            new_ord = Orderlist(order_date=timezone.now())
+            new_ord.save()
+            cart_list = Cart.objects.filter(m = cur_user)
+            user_info = Member.objects.get(m_id=cur_user)
+            address_info = Memberaddress.objects.get(m=user_info, address1=request.POST.get('address', ''))
+            t = timezone.now()
+            tracking_num = str(t)+str(new_ord.order_id)  
+            for cart in cart_list:
+                w = Warehouseinv.objects.get(p= cart.p)
+                w.quantity -= cart.quantity
+                
+                if w.quantity < 0:
+                    return render('/')
+                else:
+                    w.save()
+                
+                new_online_ord = Onlineorder(
+                    order=new_ord,
+                    p = cart.p,
+                    quantity = cart.quantity,
+                    customer_type = user_info.type,
+                    m = user_info,
+                    email = user_info.email,
+                    card_info = request.POST['card'],
+                    address1 = address_info.address1,
+                    address2 = address_info.address2,
+                    state = address_info.state,
+                    zip_code= address_info.zipcode,
+                    phone_num = request.POST['phone'],
+                    recipient_name= request.POST['r_name'],
+                    recipient_phone= request.POST['r_phone'],
+                    sc = None,
+                    tracking_num= tracking_num
+                )
+                new_online_ord.save()
+            Cart.objects.filter(m=cur_user).delete()
+            return render(request, "thankyou.html", {'tracking_num':tracking_num})
+        else:
+            cart = cart_list = Cart.objects.values('p__p_name', 'p__instore_price', 'quantity').filter(m = cur_user)
+            total = cart.annotate(tot = F('p__instore_price') * F('quantity')).aggregate(Sum('tot'))
+            card = Membercardinfo.objects.filter(m = cur_user)
+            address = Memberaddress.objects.filter(m = cur_user)
+            print(total)
+            context = {"cart_list": cart,
+                        "total": total,
+                        "card_list" : card,
+                        "address_list" : address}
+            return render(request, "checkout.html", context)
+            
     else:
         cur_user = request.COOKIES['device']
-        cart = cart_list = Cart.objects.values('p__p_name', 'p__instore_price', 'quantity').filter(m = cur_user)
-        total = cart.annotate(tot = F('p__instore_price') * F('quantity')).aggregate(Sum('tot'))
-        card = Membercardinfo.objects.filter(m = cur_user)
-        address = Memberaddress.objects.filter(m = cur_user)
-        print(total)
-        context = {"cart_list": cart,
-                    "total": total,
-                    "card" : card,
-                    "address" : address}
-        return render(request, "checkout.html", context)
+        if request.method == "POST":
+            new_ord = Orderlist(order_date=timezone.now())
+            new_ord.save()
+            cart_list = Cart.objects.filter(m = cur_user)
+            t = timezone.now()
+            tracking_num = str(t)+str(new_ord.order_id)  
+            for cart in cart_list:
+                w = Warehouseinv.objects.get(p= cart.p)
+                w.quantity -= cart.quantity
+                
+                if w.quantity < 0:
+                    return render('/')
+                else:
+                    w.save()
+                
+                new_online_ord = Onlineorder(
+                    order=new_ord,
+                    p = cart.p,
+                    quantity = cart.quantity,
+                    customer_type = None,
+                    m = None,
+                    email = None,
+                    card_info = request.POST['cardnumber'],
+                    address1 = request.POST['street'],
+                    address2 = request.POST['box'],
+                    state = request.POST['state'],
+                    zip_code=request.POST['zip'],
+                    phone_num = request.POST['phone'],
+                    recipient_name= request.POST['r_name'],
+                    recipient_phone= request.POST['r_phone'],
+                    sc = None,
+                    tracking_num= tracking_num
+                )
+                new_online_ord.save()
+            Cart.objects.filter(m=cur_user).delete()
+            return render(request, "thankyou.html", {'tracking_num':tracking_num})
+         
+        else: 
+            cur_user = request.COOKIES['device']
+            cart = cart_list = Cart.objects.values('p__p_name', 'p__instore_price', 'quantity').filter(m = cur_user)
+            total = cart.annotate(tot = F('p__instore_price') * F('quantity')).aggregate(Sum('tot'))
+            card = Membercardinfo.objects.filter(m = cur_user)
+            address = Memberaddress.objects.filter(m = cur_user)
+            print(total)
+            context = {"cart_list": cart,
+                        "total": total,
+                        "card" : card,
+                        "address" : address}
+            return render(request, "checkout.html", context)
     
         
 def cart_delete(request, p_id):
@@ -229,7 +312,6 @@ def add_card(request):
             new_exp_month = request.POST['month']
             new_exp_year = request.POST['year']
             n_card = Membercardinfo(
-                id = len(card_list)+1,
                 m_id = cur_user,
                 card_num = new_card,
                 card_name = new_cardholder,
@@ -258,7 +340,6 @@ def add_address(request):
             state = request.POST['state']
             zip_code = request.POST['zip']
             n_add = Memberaddress(
-                id = len(add_list)+1,
                 m_id = cur_user,
                 address1 = address1,
                 address2 = address2,
