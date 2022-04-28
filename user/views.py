@@ -121,7 +121,7 @@ def signup(request):
                 billing_date  = timezone.now(),
             )
             member.save()
-            return redirect('/user')
+            return redirect('/')
         return render(request, 'signup.html')
     return render(request, 'signup.html')
 
