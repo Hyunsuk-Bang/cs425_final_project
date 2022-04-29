@@ -99,11 +99,11 @@
                 Category
                 <br>
                 <select name = 'category'>
-                    <option value = "all">ALL</option>
-                    <option value = "computer"> Computer </option>
-                    <option value = "accessory"> accessory </option>
-                    <option value = "computer"> computer </option>
-                    <option value = "phone"> phone </option>
+                {% if category_list %}
+                {% for category in category_list%}
+                    <option value = {{category.category}}>{{category.category}}</option>
+                {% endfor %}
+                {% endif %}    
                 </select> 
             <form>
             </th>
@@ -113,16 +113,13 @@
                 <form method = "POST">
                     {% csrf_token %}
                     <select name = 'man'>
-                        <option value = "all">ALL</option>
-                        <option value = "man_01"> Samsung </option>
-                        <option value = "man_02"> Apple </option>
-                        <option value = "man_03"> Dell </option>
-                        <option value = "man_04"> Lonovo </option>
-                        <option value = "man_05"> Logitech </option>
-                        <option value = "man_06"> Razer </option>
-                        <option value = "man_07"> Google </option>
-                        <option value = "man_08"> Sony </option>
-                        <option value = "man_09"> Canon </option>
+                        {% if manufacturer_list %}
+                        {% for manufacturer in manufacturer_list%}
+                        <option value = {{manufacturer.manufacturer_name}}>{{manufacturer.manufacturer_name}}</option>
+                        {% endfor %}
+                        {% endif %}    
+                       
+                      
                     </select> 
                 <form>
             </th>

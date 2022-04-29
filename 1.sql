@@ -9,8 +9,17 @@ create table member(
     billing_date DATE -- NULL if type == 1,
 );
 
+create table admin(
+	a_id varchar(50) primary key,
+    s_id varchar(10),
+    name varchar(20) not null,
+    phone varchar(20) not null, 
+    email varchar(50) UNIQUE,
+    FOREIGN KEY (s_id) references store(s_id)
+);
+
 create table memberAddress(
-    id BIGINT not null auto_increment primary key, #django need this IDK why
+    id BIGINT not null auto_increment primary key,
     m_id varchar(50),
     address1 varchar(50) not null,
     address2 varchar(50),
@@ -21,7 +30,7 @@ create table memberAddress(
 );
 
 create table memberCardInfo(
-	id BIGINT not null auto_increment primary key, #django need this... IDK why
+	id BIGINT not null auto_increment primary key, 
     m_id varchar(50),
     card_num varchar(20) not null UNIQUE,
     card_name varchar(30) not null,
@@ -42,6 +51,10 @@ CREATE TABLE manufacturer(
 	phone_num varchar(20) not null
 );
 
+CREATE TABLE category(
+	category varchar(100) primary key
+);
+
 CREATE TABLE product (
     p_id varchar(10) primary key,
     category varchar(30) not null,
@@ -49,7 +62,8 @@ CREATE TABLE product (
     wholesale_price double not null,
     instore_price double not null,
     manufacturer_id varchar(20),
-    FOREIGN Key (manufacturer_id) REFERENCES manufacturer(manufacturer_id)
+    FOREIGN Key (manufacturer_id) REFERENCES manufacturer(manufacturer_id),
+	FOREIGN Key (category) REFERENCES category(category)
 );
 
 create table warehouse(
@@ -115,15 +129,16 @@ create table warehouseINV(
 	UNIQUE (w_id, p_id)
 );
 
+select * from warehouse;
 
-create table whCoverage( -- this table illustrates each warehouse's state coverage for shipping
+create table whCoverage( 
     w_id varchar(10),
-    state varchar(10),-- Illinois, Michigan etc...
+    state varchar(10),
     FOREIGN key (w_id) references warehouse(w_id),
     primary key(w_id, state)
 );
 
-create table whStore( -- This table illustrates each warehouse's store coverage for replenishing
+create table whStore(
     w_id varchar(10),
     s_id varchar(10),
     primary key(w_id, s_id),
@@ -155,7 +170,7 @@ create table onlineOrder(
 	
 	quantity int not null,
 
-	customer_type int CHECK(customer_type in (0, 1, 2)), -- 0: non-member , 1: normal-member, 2:subscript member
+	customer_type int CHECK(customer_type in (0, 1, 2)), 
 	
 	m_id varchar(50),
 
@@ -207,16 +222,59 @@ create table cart(
 	UNIQUE(m_id, p_id)
 );
 
+create table admin(
+	a_id varchar(50) primary key,
+    s_id varchar(10),
+    name varchar(20) not null,
+    phone varchar(20) not null, 
+    email varchar(50) UNIQUE,
+    FOREIGN KEY (s_id) references store(s_id)
+);
+
 delimiter //
 Create Trigger warehouseInit
 	after insert on product for each row
 	Begin
 		declare seq_id INT;
 			set seq_id = (select count(*) from product);
-		insert into warehouseINV values(seq_id, "w_1", new.p_id, 0, 30);
+		insert into warehouseINV values(seq_id, "w_1", new.p_id, 20, 50);
 	end //
-delimeter;
+delimiter;
 
+-- warehouse, stores, warehouse <-> store connection, manufacturers, categories, products, store products, admins ...
+
+-- warehouse
+INSERT INTO `db`.`warehouse`(`w_id`,`address1`,`state`,`zipcode`) VALUES ('w_1','Mars colony st. 201', 'XY', '100100');
+
+-- stores
+INSERT INTO `db`.`store`(`s_id`,`address`,`state`,`zipcode`) VALUES ('s_1','Jupiter OA', 'R2','229');
+INSERT INTO `db`.`store`(`s_id`,`address`,`state`,`zipcode`) VALUES ('s_2','Jupiter IA', 'R1','103');
+INSERT INTO `db`.`store`(`s_id`,`address`,`state`,`zipcode`) VALUES ('s_3','Jupiter Moon 17', 'G1','3');
+
+-- wharehouse <-> store
+INSERT INTO `db`.`whStore`(`w_id`, `s_id`) VALUES ('w_1','s_1');
+INSERT INTO `db`.`whStore`(`w_id`, `s_id`) VALUES ('w_1','s_2');
+INSERT INTO `db`.`whStore`(`w_id`, `s_id`) VALUES ('w_1','s_3');
+
+-- manufacturers
+INSERT INTO `db`.`manufacturer`(`manufacturer_id`,`manufacturer_name`,`email`,`phone_num`) VALUES ('man_01','Samsung','samsung@gmail.com','123456789');
+INSERT INTO `db`.`manufacturer`(`manufacturer_id`,`manufacturer_name`,`email`,`phone_num`) VALUES ('man_02','Apple','apple@gmail.com','923428789');
+INSERT INTO `db`.`manufacturer`(`manufacturer_id`,`manufacturer_name`,`email`,`phone_num`) VALUES ('man_03','Dell','dell@gmail.com','234567389');
+INSERT INTO `db`.`manufacturer`(`manufacturer_id`,`manufacturer_name`,`email`,`phone_num`) VALUES ('man_04','Lenovo','lenovo@gmail.com','393456789');
+INSERT INTO `db`.`manufacturer`(`manufacturer_id`,`manufacturer_name`,`email`,`phone_num`) VALUES ('man_05','Logitech','logitech@gmail.com','113456789');
+INSERT INTO `db`.`manufacturer`(`manufacturer_id`,`manufacturer_name`,`email`,`phone_num`) VALUES ('man_06','Razer','razer@gmail.com','723456789');
+INSERT INTO `db`.`manufacturer`(`manufacturer_id`,`manufacturer_name`,`email`,`phone_num`) VALUES ('man_07','Google','google@gmail.com','703456789');
+INSERT INTO `db`.`manufacturer`(`manufacturer_id`,`manufacturer_name`,`email`,`phone_num`) VALUES ('man_08','Sony','sony@gmail.com','273456789');
+INSERT INTO `db`.`manufacturer`(`manufacturer_id`,`manufacturer_name`,`email`,`phone_num`) VALUES ('man_09','Canon','canon@gmail.com','993456789');
+
+-- categories
+INSERT INTO `db`.`category`(`category`) VALUES ('computer');
+INSERT INTO `db`.`category`(`category`) VALUES ('phone');
+INSERT INTO `db`.`category`(`category`) VALUES ('tablet');
+INSERT INTO `db`.`category`(`category`) VALUES ('accessory');
+INSERT INTO `db`.`category`(`category`) VALUES ('camera');
+
+-- products
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_1', 'computer', 'Galaxy Book', 1000, 1200, 'man_01');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_2', 'phone', 'galaxy s 22', 1000, 1300, 'man_01');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_3', 'phone', 'galaxy z flip', 1200, 1400, 'man_01');
@@ -224,11 +282,11 @@ INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `in
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_5', 'computer', 'macbook air', 800, 1000, 'man_02');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_6', 'computer', 'macbook pro', 1500, 1700, 'man_02');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_7', 'computer', 'macbook studio', 2500, 2700, 'man_02');
-INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_8', 'phone', 'Iphone14', 1300, 1400, 'mann_02');
+INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_8', 'phone', 'Iphone14', 1300, 1400, 'man_02');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_9', 'tablet', 'Ipad', 1500, 1700, 'man_02');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_10', 'computer', 'dell book', 1100, 1300, 'man_03');
-INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_11', 'computer ', 'dell book pro', 1600, 1800, 'man_03');
-INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_12', 'computre', 'Lenovo Carbon', 1700, 1900, 'man_04');
+INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_11', 'computer', 'dell book pro', 1600, 1800, 'man_03');
+INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_12', 'computer', 'Lenovo Carbon', 1700, 1900, 'man_04');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_13', 'computer', 'Lenovo Think pad', 1400, 2600, 'man_04');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_14', 'accessory', 'Logitech keyboard', 200, 250, 'man_05');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_15', 'accessory', 'Logitech keyboard pro', 400, 450, 'man_05');
@@ -242,3 +300,37 @@ INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `in
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_23', 'camera', 'sony dslr', 2999, 3200, 'man_08');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_24', 'camera', 'canon pro', 3000, 3300, 'man_09');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_25', 'camera', 'canon beginner', 1200, 1400, 'man_09');
+
+-- store products
+-- store s_1 (mostly computers and accessories)
+
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_1','p_5',5,10);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_1','p_6',7,10);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_1','p_7',3,10);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_1','p_10',1,10);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_1','p_11',9,10);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_1','p_12',6,10);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_1','p_14',2,15);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_1','p_15',9,15);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_1','p_16',12,10);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_1','p_3',2,5);
+
+
+-- store s_2 (mostly phones and tablets)
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_2','p_2',9,15);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_2','p_3',2,15);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_2','p_19',14,15);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_2','p_20',10,15);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_2','p_21',3,15);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_2','p_4',15,20);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_2','p_9',13,20);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_2','p_22',2,5);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_2','p_23',3,5);
+
+-- store s_3 (just cameras)
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_3','p_22',10,20);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_3','p_23',15,20);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_3','p_24',17,20);
+INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_3','p_25',9,20);
+
+-- TODO store admins, maybe through django admin page only.

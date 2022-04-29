@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.constraints import *
 from product.models import Product
+from warehouseStore.models import Store
 
 # Create your models here.
 class Member(models.Model):
@@ -19,6 +20,17 @@ class Member(models.Model):
     class Meta:
         managed = False
         db_table = 'member'
+
+class Admin(models.Model):
+    a_id = models.CharField(primary_key=True, max_length=50)
+    s = models.ForeignKey(Store, models.DO_NOTHING, null=False, db_column='s_id')
+    name = models.CharField(max_length=20)
+    phone = models.CharField(max_length=20)
+    email = models.CharField(unique=True, max_length=50, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'admin'
 
 # class Bank(models.Model):
 #     card_num = models.ForeignKey('Membercardinfo', models.DO_NOTHING, db_column='card_num', blank=True, null=True)

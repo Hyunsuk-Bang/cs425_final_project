@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from .models import *
-from product.models import Product 
+from product.models import Category, Product 
 from warehouseStore.models import Warehouseinv
 from django.utils import timezone
 from django.db.models import Sum, F
@@ -263,15 +263,19 @@ def home(request):
             product_list = Product.objects.filter(manufacturer=request.POST.get('man'), category=request.POST.get('category')) 
             
     product_list = product_list.values('p_id','p_name','category', 'instore_price', 'manufacturer__manufacturer_name') 
+    manufacturer_list = Manufacturer.objects.all().values('manufacturer_name')
+    category_list = Category.objects.all().values('category')
+    print(manufacturer_list)
+    print(category_list)
     
     if request.user.is_authenticated:
         try:
             cur_user = Member.objects.get(m_id = request.user.username) 
             
-            context = {'username': cur_user.get_name(), 'product_list':product_list} 
+            context = {'username': cur_user.get_name(), 'product_list':product_list, 'manufacturer_list':manufacturer_list, 'category_list':category_list} 
             return render(request, 'home.html', context)
         except:
-            return render(request, 'home.html', {'product_list':product_list})
+            return render(request, 'home.html', {'product_list':product_list, 'manufacturer_list':manufacturer_list, 'category_list':category_list})
         
     else:
         device = request.COOKIES['device']
@@ -284,7 +288,7 @@ def home(request):
             user_status = 1,
             reg_date = '2999-12-31',
             billing_date = '2999-12-31')
-        return render(request, 'home.html', {'product_list':product_list} )
+        return render(request, 'home.html', {'product_list':product_list, 'manufacturer_list':manufacturer_list, 'category_list':category_list} )
 
 
 def cart(request):
