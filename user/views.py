@@ -2,13 +2,20 @@ from django.contrib import auth
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
+from django.http import HttpResponse
 from .models import *
 from product.models import Category, Product 
-from warehouseStore.models import Warehouseinv
+from warehouseStore.models import *
 from django.utils import timezone
 from django.db.models import Sum, F
 from order.models import *
 import random
+
+def view(request):
+    response = HttpResponse("hello")
+    response.set_cookie('device')
+    return response
+
 
 
 def checkout(request):
@@ -170,7 +177,7 @@ def cart_minus(request, p_id):
     return redirect('/cart')
 
 def product_detail(request, p_id):
-    product = Product.objects.values('p_id','p_name','category', 'instore_price', 'manufacturer__manufacturer_name').get(p_id = p_id)
+    product = Product.objects.values('p_id','p_name','category', 'instore_price', 'manufacturer_id__manufacturer_name').get(p_id = p_id)
     whi = Warehouseinv.objects.values('quantity').get(p = p_id)
     
     if request.method == "POST":
@@ -218,7 +225,7 @@ def signup(request):
                                             email=request.POST['email'])
             
             auth.login(request, user)
-    
+        
             member = Member(
                 m_id = request.POST['username'],
                 name = request.POST['name'],
@@ -263,19 +270,92 @@ def home(request):
             product_list = Product.objects.filter(manufacturer=request.POST.get('man'), category=request.POST.get('category')) 
             
     product_list = product_list.values('p_id','p_name','category', 'instore_price', 'manufacturer__manufacturer_name') 
-    manufacturer_list = Manufacturer.objects.all().values('manufacturer_name')
+    manufacturer_list = Manufacturer.objects.all().values('manufacturer_name', 'manufacturer_id')
     category_list = Category.objects.all().values('category')
-    print(manufacturer_list)
-    print(category_list)
     
     if request.user.is_authenticated:
-        try:
-            cur_user = Member.objects.get(m_id = request.user.username) 
+        cur_user = request.user.username
+        try: 
+            store_admin = storeAdmin.objects.get(store_a_id =cur_user)
+            inv = Storeinv.objects.values('p__p_name', 'quantity').filter(s = store_admin.s)
+            wh = Warehouseinv.objects.values('p__p_name', 'quantity', 'p').filter(w = 'w_1')
+            if request.method == 'POST':
+                p = Product.objects.get(p_id = request.POST['product'])
+                print(p)
+                q = request.POST['quantity']
+                in_stock = Warehouseinv.objects.get(p=p)
+                if int(q) < in_stock.quantity:
+                    try:
+                        store_inv = Storeinv.objects.get(s = store_admin.s, p = p)
+                        store_inv.quantity += int(q)
+                        store_inv.save()
+                    except:
+                        new_product = Storeinv(
+                            s = store_admin.s,
+                            p = p,
+                            quantity= int(q),
+                            threshold = 50
+                        )
+                        new_product.save()
+                    
+                    wh_inv = Warehouseinv.objects.get(w = 'w_1', p = p)
+                    wh_inv.quantity -= int(q)
+                    wh_inv.save()
+                    
+                    log = Restockstore(
+                        s = store_admin.s,
+                        w = Warehouse.objects.get(w_id = 'w_1'),
+                        p = p,
+                        quantity= int(q),
+                        restock_date= timezone.now()
+                    )
+                    log.save()
+                    context = {"store_inv": inv, "warehouse_inv":wh, "message" : "success"}
+                    return render(request, 'store_admin.html', context) 
+                else:
+                    context = {"store_inv": inv, "warehouse_inv":wh, "error" : "can't request more than what we have"}
+                    return render(request, 'store_admin.html', context) 
+                
+            else:
+                context = {"store_inv": inv, "warehouse_inv":wh}
+                return render(request, 'store_admin.html', context)
             
-            context = {'username': cur_user.get_name(), 'product_list':product_list, 'manufacturer_list':manufacturer_list, 'category_list':category_list} 
-            return render(request, 'home.html', context)
-        except:
-            return render(request, 'home.html', {'product_list':product_list, 'manufacturer_list':manufacturer_list, 'category_list':category_list})
+        except: 
+            try:
+                wh_admin = warehouseAdmin.objects.get(wh_a_id=cur_user)
+                if request.method == "POST":
+                    p = Product.objects.get(p_id = request.POST['product'])
+                    q = request.POST['quantity']
+                    wh_inv = Warehouseinv.objects.get(w = wh_admin.w, p = p)
+                    wh_inv.quantity += int(q)
+                    wh_inv.save()
+                    
+  
+                    log = Restockwarehouse(
+                        w = wh_admin.w,
+                        p = p,
+                        quantity= int(q),
+                        manufacturer= p.manufacturer,
+                        restock_date = timezone.now()
+                    )
+                    log.save()
+                    
+                    inv = Warehouseinv.objects.values('p__p_name', 'quantity', 'p__manufacturer_id__manufacturer_name', 'p').filter(w = Warehouse.objects.get(w_id = 'w_1'))
+                    context = {'warehouse_inv': inv}
+                    return render(request, 'warehouse_admin.html', context)
+                else:
+                    inv = Warehouseinv.objects.values('p__p_name', 'quantity', 'p__manufacturer_id__manufacturer_name','p').filter(w = Warehouse.objects.get(w_id = 'w_1'))
+                    context = {'warehouse_inv': inv}
+                    return render(request, 'warehouse_admin.html', context)
+        
+            except:
+                try:
+                    cur_user = Member.objects.get(m_id = request.user.username) 
+                    
+                    context = {'username': cur_user.get_name(), 'product_list':product_list, 'manufacturer_list':manufacturer_list, 'category_list':category_list} 
+                    return render(request, 'home.html', context)
+                except:
+                    return render(request, 'home.html', {'product_list':product_list, 'manufacturer_list':manufacturer_list, 'category_list':category_list})
         
     else:
         device = request.COOKIES['device']

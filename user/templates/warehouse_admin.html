@@ -1,0 +1,61 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+WAREHOUSE
+
+<div class="container">
+    <div class="row">
+      <div class="col">
+        <table class = "table">
+            <thead>
+            <tr class = "table-dark">
+                <th></th>
+                <th> Product Name </th>
+                <th>quantity </th>
+                <th> manufacturer</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+    
+        {% if warehouse_inv %}
+        {%for product in warehouse_inv %}
+        <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{ product.p__p_name }}</td>
+            <td> {{product.quantity}}</td>
+            <td>{{product.p__manufacturer_id__manufacturer_name}} </td>
+    
+        </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td>NO product</td>
+            </tr>
+            {% endif %}
+    
+            </tbody>
+    
+        </table>
+      </div>
+
+      <div class="col">
+        <form method="POST">
+            {% csrf_token %}
+            <select class="form-select" aria-label="Default select example" name = "product">
+                {% if warehouse_inv %}
+                {% for wh in warehouse_inv%}
+                    <option value = {{wh.p}}> {{wh.p__p_name}}------{{wh.quantity}} left </option>
+                {% endfor %}
+                {% endif %}    
+            </select> 
+            <input class="form-control form-control-sm" type="text" placeholder="quantity" aria-label=".form-control-sm example" name = "quantity">
+            <input type="submit" class="btn btn-primary" value="Request">
+        </form>
+        <button class="btn btn-primary" onclick = "location.href='logout';"> logout </button>  
+      
+    </div>
+  </div>
+
+
+

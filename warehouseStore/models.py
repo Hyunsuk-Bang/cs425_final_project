@@ -22,7 +22,6 @@ class Store(models.Model):
         db_table = 'store'
 
 
-
 class Warehouseinv(models.Model):
     id = models.AutoField(primary_key=True)
     w = models.ForeignKey(Warehouse, models.DO_NOTHING)
@@ -71,11 +70,11 @@ class Whstore(models.Model):
 
 
 class Storeinv(models.Model):
-    s = models.OneToOneField(Store, models.DO_NOTHING, primary_key=True)
+    id = models.AutoField(primary_key=True) 
+    s = models.ForeignKey(Store, models.DO_NOTHING)
     p = models.ForeignKey(Product, models.DO_NOTHING)
     quantity = models.IntegerField(blank=True, null=True)
     threshold = models.IntegerField(blank=True, null=True)
-    type = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -94,3 +93,27 @@ class Storereorder(models.Model):
         managed = False
         db_table = 'storeReorder'
         unique_together = (('s', 'p', 'reorderdate'),)
+
+
+class Restockstore(models.Model):
+    s = models.ForeignKey('Store', models.DO_NOTHING, blank=True, null=True)
+    w = models.ForeignKey('Warehouse', models.DO_NOTHING, blank=True, null=True)
+    p = models.ForeignKey(Product, models.DO_NOTHING, blank=True, null=True)
+    quantity = models.BigIntegerField(blank=True, null=True)
+    restock_date = models.DateField()
+
+    class Meta:
+        managed = False
+        db_table = 'restockStore'
+
+
+class Restockwarehouse(models.Model):
+    w = models.ForeignKey('Warehouse', models.DO_NOTHING, blank=True, null=True)
+    manufacturer = models.ForeignKey(Manufacturer, models.DO_NOTHING, blank=True, null=True)
+    p = models.ForeignKey(Product, models.DO_NOTHING, blank=True, null=True)
+    quantity = models.BigIntegerField(blank=True, null=True)
+    restock_date = models.DateField()
+
+    class Meta:
+        managed = False
+        db_table = 'restockWarehouse'

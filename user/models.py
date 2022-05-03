@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models.constraints import *
 from product.models import Product
-from warehouseStore.models import Store
+from warehouseStore.models import Store, Warehouse
 
 # Create your models here.
 class Member(models.Model):
@@ -21,8 +21,8 @@ class Member(models.Model):
         managed = False
         db_table = 'member'
 
-class Admin(models.Model):
-    a_id = models.CharField(primary_key=True, max_length=50)
+class storeAdmin(models.Model):
+    store_a_id = models.CharField(primary_key=True, max_length=50)
     s = models.ForeignKey(Store, models.DO_NOTHING, null=False, db_column='s_id')
     name = models.CharField(max_length=20)
     phone = models.CharField(max_length=20)
@@ -30,15 +30,26 @@ class Admin(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'admin'
+        db_table = 'storeAdmin'
 
-# class Bank(models.Model):
-#     card_num = models.ForeignKey('Membercardinfo', models.DO_NOTHING, db_column='card_num', blank=True, null=True)
-#     balance = models.FloatField()
+class warehouseAdmin(models.Model):
+    wh_a_id = models.CharField(primary_key=True, max_length=50)
+    w = models.ForeignKey(Warehouse, models.DO_NOTHING, null=False, db_column='w_id')
+    name = models.CharField(max_length=20)
+    phone = models.CharField(max_length=20)
+    email = models.CharField(unique=True, max_length=50, blank=True, null=True)
 
-#     class Meta:
-#         managed = False
-#         db_table = 'bank'
+    class Meta:
+        managed = False
+        db_table = 'warehouseAdmin'
+
+class Bank(models.Model):
+    card_num = models.ForeignKey('Membercardinfo', models.DO_NOTHING, db_column='card_num', blank=True, null=True)
+    balance = models.FloatField()
+
+    class Meta:
+        managed = False
+        db_table = 'bank'
 
 class Memberaddress(models.Model):
     id = models.AutoField(primary_key=True)

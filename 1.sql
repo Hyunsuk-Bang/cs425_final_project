@@ -42,6 +42,7 @@ create table memberCardInfo(
 );
 
 
+select * from store limit ((select count(*) from store)-1);
 
 
 CREATE TABLE manufacturer(
@@ -107,14 +108,14 @@ Create Table storeReorder(
 
 
 create table storeINV(
+	id BIGINT not null auto_increment primary key,
 	s_id varchar(10),
 	p_id varchar(10),
 	quantity int default 0,
 	threshold int default 0,
 	FOREIGN key (s_id) references store(s_id),
 	FOREIGN KEY (p_id) references product(p_id),
-	PRIMARY key (s_id, p_id),
-	type int check(type in (0,1))
+	UNIQUE (s_id, p_id)
 );
 
 
@@ -129,7 +130,6 @@ create table warehouseINV(
 	UNIQUE (w_id, p_id)
 );
 
-select * from warehouse;
 
 create table whCoverage( 
     w_id varchar(10),
@@ -222,8 +222,8 @@ create table cart(
 	UNIQUE(m_id, p_id)
 );
 
-create table admin(
-	a_id varchar(50) primary key,
+create table storeAdmin(
+	store_a_id varchar(50) primary key,
     s_id varchar(10),
     name varchar(20) not null,
     phone varchar(20) not null, 
@@ -231,15 +231,50 @@ create table admin(
     FOREIGN KEY (s_id) references store(s_id)
 );
 
-delimiter //
+create table restockStore(
+	s_id varchar(10),
+	w_id varchar(10),
+	p_id varchar(10),
+	quantity BIGINT Check (quantity > 0),
+	restock_date date not null,
+	FOREIGN KEY (s_id) references store(s_id),
+	FOREIGN key (w_id) references warehouse(w_id),
+	Foreign key (p_id) references product(p_id)
+);
+
+create table restockWarehouse(
+	w_id varchar(10),
+	manufacturer_id varchar(10),
+	p_id VARCHAR(10),
+	quantity BIGINT Check (quantity > 0),
+	restock_date date not null,
+	FOREIGN KEY (w_id) references warehouse(w_id),
+	FOREIGN key (manufacturer_id) references manufacturer(manufacturer_id),
+	FOREIGN key (p_id) references product(p_id)
+);
+
+create table warehouseAdmin(
+	wh_a_id varchar(50) primary key,
+    w_id varchar(10),
+    name varchar(20) not null,
+    phone varchar(20) not null, 
+    email varchar(50) UNIQUE,
+    FOREIGN KEY (w_id) references warehouse(w_id)
+);
+
+
+
+
+
 Create Trigger warehouseInit
 	after insert on product for each row
 	Begin
 		declare seq_id INT;
 			set seq_id = (select count(*) from product);
 		insert into warehouseINV values(seq_id, "w_1", new.p_id, 20, 50);
-	end //
-delimiter;
+	end;
+
+
 
 -- warehouse, stores, warehouse <-> store connection, manufacturers, categories, products, store products, admins ...
 
@@ -275,7 +310,7 @@ INSERT INTO `db`.`category`(`category`) VALUES ('accessory');
 INSERT INTO `db`.`category`(`category`) VALUES ('camera');
 
 -- products
-INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_1', 'computer', 'Galaxy Book', 1000, 1200, 'man_01');
+ 
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_2', 'phone', 'galaxy s 22', 1000, 1300, 'man_01');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_3', 'phone', 'galaxy z flip', 1200, 1400, 'man_01');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_4', 'tablet', 'galaxy tab', 1300, 1450, 'man_01');
@@ -299,10 +334,11 @@ INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `in
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_22', 'camera', 'sony xdr cam', 1500, 1700, 'man_08');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_23', 'camera', 'sony dslr', 2999, 3200, 'man_08');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_24', 'camera', 'canon pro', 3000, 3300, 'man_09');
-INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_25', 'camera', 'canon beginner', 1200, 1400, 'man_09');
+INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`)
+ VALUES ('p_25', 'camera', 'canon beginner', 1200, 1400, 'man_09');
 
--- store products
--- store s_1 (mostly computers and accessories)
+store products
+store s_1 (mostly computers and accessories)
 
 INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_1','p_5',5,10);
 INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_1','p_6',7,10);

@@ -25,7 +25,7 @@
     }
     let device = getCookie('device')
 
-    if(device== null || device == undefined){
+    if(device== null || device == undefined ){
         device = uuidv4()
     }
 
@@ -99,6 +99,7 @@
                 Category
                 <br>
                 <select name = 'category'>
+                <option value = "all"> category </option>
                 {% if category_list %}
                 {% for category in category_list%}
                     <option value = {{category.category}}>{{category.category}}</option>
@@ -113,9 +114,10 @@
                 <form method = "POST">
                     {% csrf_token %}
                     <select name = 'man'>
+                        <option value = "all"> manufacturer </option>
                         {% if manufacturer_list %}
                         {% for manufacturer in manufacturer_list%}
-                        <option value = {{manufacturer.manufacturer_name}}>{{manufacturer.manufacturer_name}}</option>
+                        <option value = {{manufacturer.manufacturer_id}}>{{manufacturer.manufacturer_name}}</option>
                         {% endfor %}
                         {% endif %}    
                        
