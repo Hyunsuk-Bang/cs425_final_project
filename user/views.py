@@ -28,7 +28,7 @@ def checkout(request):
         if request.method == "POST":
             if request.POST.get('card'):
                 card_num = request.POST['card']
-                balance = Membercardinfo.objecst.get(m = cur_user, card_num = card_num)
+                balance = Membercardinfo.objects.get(m = cur_user, card_num = card_num)
                 if balance.balance > total['tot__sum']:
                     balance.balance = round(balance.balance - total['tot__sum'], 2)
                     balance.save()
@@ -78,7 +78,7 @@ def checkout(request):
                         address2 = address2,
                         state = state,
                         zip_code= zipcode,
-                        phone_num = request.POST['phone'],
+                        phone_num = user_info.phone,
                         recipient_name= request.POST['r_name'],
                         recipient_phone= request.POST['r_phone'],
                         sc = None,
@@ -487,7 +487,7 @@ def add_address(request):
     
 def history(request):
     mem = Member.objects.get(m_id=request.user.username)
-    hist = Onlineorder.objects.values('p__p_name', 'quantity', 'card_info', 'order_date').filter(m = mem)
+    hist = Onlineorder.objects.values('p__p_name', 'quantity', 'card_info', 'order_date','address1','phone_num').filter(m = mem)
     return render(request, "history.html", {'history':hist})
 
 def card_delete(request, card_num):
