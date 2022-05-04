@@ -265,7 +265,7 @@ delimiter;
 
 
 
--- warehouse, stores, warehouse <-> store connection, manufacturers, categories, products, store products, admins ...
+-- warehouse, stores, warehouse to store connection, manufacturers, categories, products, store products, admins ...
 
 -- warehouse
 INSERT INTO `db`.`warehouse`(`w_id`,`address1`,`state`,`zipcode`) VALUES ('w_1','Mars colony st. 201', 'XY', '100100');
@@ -326,8 +326,8 @@ INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `in
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`)
  VALUES ('p_25', 'camera', 'canon beginner', 1200, 1400, 'man_09');
 
-store products
-store s_1 (mostly computers and accessories)
+-- store products
+-- store s_1 (mostly computers and accessories)
 
 INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_1','p_5',5,10);
 INSERT INTO `db`.`storeINV`(`s_id`,`p_id`,`quantity`,`threshold`) VALUES ('s_1','p_6',7,10);
