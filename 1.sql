@@ -9,15 +9,6 @@ create table member(
     billing_date DATE -- NULL if type == 1,
 );
 
-create table admin(
-	a_id varchar(50) primary key,
-    s_id varchar(10),
-    name varchar(20) not null,
-    phone varchar(20) not null, 
-    email varchar(50) UNIQUE,
-    FOREIGN KEY (s_id) references store(s_id)
-);
-
 create table memberAddress(
     id BIGINT not null auto_increment primary key,
     m_id varchar(50),
@@ -40,10 +31,6 @@ create table memberCardInfo(
     balance double not null,
     UNIQUE(m_id, card_num)
 );
-
-
-select * from store limit ((select count(*) from store)-1);
-
 
 CREATE TABLE manufacturer(
 	manufacturer_id varchar(20) primary key,
@@ -265,7 +252,7 @@ create table warehouseAdmin(
 
 
 
-
+delimiter //
 Create Trigger warehouseInit
 	after insert on product for each row
 	Begin
@@ -273,6 +260,8 @@ Create Trigger warehouseInit
 			set seq_id = (select count(*) from product);
 		insert into warehouseINV values(seq_id, "w_1", new.p_id, 20, 50);
 	end;
+delimiter;
+
 
 
 
@@ -310,7 +299,7 @@ INSERT INTO `db`.`category`(`category`) VALUES ('accessory');
 INSERT INTO `db`.`category`(`category`) VALUES ('camera');
 
 -- products
- 
+
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_2', 'phone', 'galaxy s 22', 1000, 1300, 'man_01');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_3', 'phone', 'galaxy z flip', 1200, 1400, 'man_01');
 INSERT INTO `db`.`product` (`p_id`, `category`, `p_name`, `wholesale_price`, `instore_price`, `manufacturer_id`) VALUES ('p_4', 'tablet', 'galaxy tab', 1300, 1450, 'man_01');
