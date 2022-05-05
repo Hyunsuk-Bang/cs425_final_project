@@ -277,7 +277,7 @@ def home(request):
         cur_user = request.user.username
         try: 
             store_admin = storeAdmin.objects.get(store_a_id =cur_user)
-            inv = Storeinv.objects.values('p__p_name', 'quantity').filter(s = store_admin.s)
+            inv = Storeinv.objects.values('p__p_name', 'quantity','p__instore_price').filter(s = store_admin.s)
             wh = Warehouseinv.objects.values('p__p_name', 'quantity', 'p').filter(w = 'w_1')
             if request.method == 'POST':
                 p = Product.objects.get(p_id = request.POST['product'])
@@ -324,25 +324,30 @@ def home(request):
             try:
                 wh_admin = warehouseAdmin.objects.get(wh_a_id=cur_user)
                 if request.method == "POST":
-                    p = Product.objects.get(p_id = request.POST['product'])
-                    q = request.POST['quantity']
-                    wh_inv = Warehouseinv.objects.get(w = wh_admin.w, p = p)
-                    wh_inv.quantity += int(q)
-                    wh_inv.save()
+                    try:
+                        p = Product.objects.get(p_id = request.POST['product'])
+                        q = request.POST['quantity']
+                        wh_inv = Warehouseinv.objects.get(w = wh_admin.w, p = p)
+                        wh_inv.quantity += int(q)
+                        wh_inv.save()
+                        
+    
+                        log = Restockwarehouse(
+                            w = wh_admin.w,
+                            p = p,
+                            quantity= int(q),
+                            manufacturer= p.manufacturer,
+                            restock_date = timezone.now()
+                        )
+                        log.save()
                     
-  
-                    log = Restockwarehouse(
-                        w = wh_admin.w,
-                        p = p,
-                        quantity= int(q),
-                        manufacturer= p.manufacturer,
-                        restock_date = timezone.now()
-                    )
-                    log.save()
-                    
-                    inv = Warehouseinv.objects.values('p__p_name', 'quantity', 'p__manufacturer_id__manufacturer_name', 'p').filter(w = Warehouse.objects.get(w_id = 'w_1'))
-                    context = {'warehouse_inv': inv}
-                    return render(request, 'warehouse_admin.html', context)
+                        inv = Warehouseinv.objects.values('p__p_name', 'quantity', 'p__manufacturer_id__manufacturer_name', 'p').filter(w = Warehouse.objects.get(w_id = 'w_1'))
+                        context = {'warehouse_inv': inv, "message": "message"}
+                        return render(request, 'warehouse_admin.html', context)
+                    except:
+                        inv = Warehouseinv.objects.values('p__p_name', 'quantity', 'p__manufacturer_id__manufacturer_name', 'p').filter(w = Warehouse.objects.get(w_id = 'w_1'))
+                        context = {'warehouse_inv': inv, "error": "message"}
+                        return render(request, 'warehouse_admin.html', context)
                 else:
                     inv = Warehouseinv.objects.values('p__p_name', 'quantity', 'p__manufacturer_id__manufacturer_name','p').filter(w = Warehouse.objects.get(w_id = 'w_1'))
                     context = {'warehouse_inv': inv}
