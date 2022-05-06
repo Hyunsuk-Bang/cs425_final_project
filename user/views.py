@@ -481,9 +481,8 @@ def add_address(request):
                 zipcode = zip_code
             )
             n_add.save()
-            add_list = Memberaddress.objects.filter(m_id = mem)
-            context = {'address_list' : add_list}
-            return render(request, 'address.html', context)
+            
+            return address(request)
         except Exception as e:
             print(e)
             return address(request)
